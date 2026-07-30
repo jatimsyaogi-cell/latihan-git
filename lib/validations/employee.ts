@@ -20,6 +20,7 @@ export const employeeFormSchema = z.object({
   joinedAt: z.coerce.date({
     errorMap: () => ({ message: "Tanggal masuk tidak valid" }),
   }),
+  avatarUrl: z.string().trim().url("URL avatar tidak valid").optional().or(z.literal("")),
 });
 
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;

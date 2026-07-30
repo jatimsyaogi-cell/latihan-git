@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
 import { DeleteEmployeeDialog } from "@/components/employees/delete-employee-dialog";
 import { EmptyState } from "@/components/employees/empty-state";
@@ -61,9 +62,18 @@ export function EmployeeTable({
             <TableRow key={employee.id}>
               <TableCell className="font-medium">{employee.nip}</TableCell>
               <TableCell>
-                <div className="font-medium">{employee.name}</div>
-                <div className="text-xs text-muted-foreground md:hidden">
-                  {employee.email}
+                <div className="flex items-center gap-3">
+                  <EmployeeAvatar
+                    name={employee.name}
+                    src={employee.avatarUrl}
+                    size={36}
+                  />
+                  <div>
+                    <div className="font-medium">{employee.name}</div>
+                    <div className="text-xs text-muted-foreground md:hidden">
+                      {employee.email}
+                    </div>
+                  </div>
                 </div>
               </TableCell>
               <TableCell className="hidden md:table-cell">
