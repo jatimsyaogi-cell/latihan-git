@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
-import { getEmployees, getEmployeeStats } from "@/lib/employees/queries";
+import { Download, Plus } from "lucide-react";
+import { getEmployees, getEmployeeStats, getDepartmentStats } from "@/lib/employees/queries";
 import { employeeListQuerySchema } from "@/lib/validations/employee";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmployeeFilters } from "@/components/employees/employee-filters";
 import { EmployeeTable } from "@/components/employees/employee-table";
+import { DepartmentStats } from "@/components/employees/department-stats";
 import { EmployeePagination } from "@/components/employees/employee-pagination";
 import { Suspense } from "react";
 
@@ -40,9 +41,10 @@ export default async function EmployeesPage({
   const params = parsedParams.success
     ? parsedParams.data
     : employeeListQuerySchema.parse({});
-  const [result, stats] = await Promise.all([
+  const [result, stats, departmentStats] = await Promise.all([
     getEmployees(params),
     getEmployeeStats(),
+    getDepartmentStats(),
   ]);
 
   const hasActiveFilters = Boolean(
@@ -55,12 +57,26 @@ export default async function EmployeesPage({
         title="Daftar Karyawan"
         description="Kelola data karyawan: cari, filter, tambah, ubah, dan hapus."
         actions={
-          <Button asChild>
-            <Link href="/employees/new">
-              <Plus className="h-4 w-4" />
-              Tambah Karyawan
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" disabled={result.total === 0}>
+              <Link
+                href={`/employees/export?${new URLSearchParams({
+                  ...(params.q ? { q: params.q } : {}),
+                  ...(params.department ? { department: params.department } : {}),
+                  ...(params.status ? { status: params.status } : {}),
+                }).toString()}`}
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/employees/new">
+                <Plus className="h-4 w-4" />
+                Tambah Karyawan
+              </Link>
+            </Button>
+          </div>
         }
       />
 
@@ -96,6 +112,8 @@ export default async function EmployeesPage({
           </CardContent>
         </Card>
       </div>
+
+      <DepartmentStats stats={departmentStats} />
 
       <Suspense fallback={null}>
         <EmployeeFilters />

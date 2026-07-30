@@ -118,7 +118,16 @@ export function EmployeeForm({ mode, employee }: EmployeeFormProps) {
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="nip">NIP</Label>
-            <Input id="nip" placeholder="EMP013" {...register("nip")} />
+            <Input
+              id="nip"
+              placeholder={mode === "create" ? "Kosongkan untuk otomatis" : "EMP013"}
+              {...register("nip")}
+            />
+            {mode === "create" ? (
+              <p className="text-xs text-muted-foreground">
+                Kosongkan agar dibuat otomatis berurutan (mis. EMP013).
+              </p>
+            ) : null}
             {errors.nip ? (
               <p className="text-sm text-destructive">{errors.nip.message}</p>
             ) : null}
