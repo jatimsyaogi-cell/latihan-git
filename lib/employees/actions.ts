@@ -10,6 +10,7 @@ import {
   employeeIdSchema,
 } from "@/lib/validations/employee";
 import { generateNextNip } from "@/lib/employees/queries";
+import { requireSession } from "@/lib/auth/session";
 
 export type ActionResult<T = void> =
   | { success: true; data?: T }
@@ -57,6 +58,7 @@ function mapPrismaError(error: unknown): ActionResult {
 }
 
 export async function createEmployee(raw: unknown): Promise<ActionResult> {
+  await requireSession();
   const parsed = employeeCreateSchema.safeParse(raw);
   if (!parsed.success) {
     return {
@@ -89,6 +91,7 @@ export async function updateEmployee(
   id: string,
   raw: unknown,
 ): Promise<ActionResult> {
+  await requireSession();
   const idParsed = employeeIdSchema.safeParse(id);
   if (!idParsed.success) {
     return { success: false, error: "ID tidak valid" };
@@ -123,6 +126,7 @@ export async function updateEmployee(
 }
 
 export async function deleteEmployee(id: string): Promise<ActionResult> {
+  await requireSession();
   const idParsed = employeeIdSchema.safeParse(id);
   if (!idParsed.success) {
     return { success: false, error: "ID tidak valid" };

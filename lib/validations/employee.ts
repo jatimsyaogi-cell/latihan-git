@@ -16,7 +16,7 @@ export const employeeFormSchema = z.object({
     errorMap: () => ({ message: "Departemen tidak valid" }),
   }),
   position: z.string().trim().min(2, "Jabatan wajib diisi").max(100),
-  status: employeeStatusSchema.default("ACTIVE"),
+  status: employeeStatusSchema,
   joinedAt: z.coerce.date({
     errorMap: () => ({ message: "Tanggal masuk tidak valid" }),
   }),

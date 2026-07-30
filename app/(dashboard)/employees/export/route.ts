@@ -22,7 +22,9 @@ export async function GET(request: Request) {
     status: normalized.status,
   });
 
-  const filters = parsed.success ? parsed.data : {};
+  const filters = parsed.success
+    ? parsed.data
+    : { q: undefined, department: undefined, status: undefined };
   const employees = await getEmployeesForExport({
     q: filters.q,
     department: filters.department,
