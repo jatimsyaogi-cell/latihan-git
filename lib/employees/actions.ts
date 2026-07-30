@@ -5,9 +5,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import {
+  employeeCreateSchema,
   employeeFormSchema,
   employeeIdSchema,
 } from "@/lib/validations/employee";
+import { generateNextNip } from "@/lib/employees/queries";
 
 export type ActionResult<T = void> =
   | { success: true; data?: T }
@@ -55,7 +57,7 @@ function mapPrismaError(error: unknown): ActionResult {
 }
 
 export async function createEmployee(raw: unknown): Promise<ActionResult> {
-  const parsed = employeeFormSchema.safeParse(raw);
+  const parsed = employeeCreateSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       success: false,
@@ -65,9 +67,13 @@ export async function createEmployee(raw: unknown): Promise<ActionResult> {
   }
 
   try {
+    const providedNip = parsed.data.nip?.trim();
+    const nip = providedNip ? providedNip : await generateNextNip();
+    const { nip: _nip, ...rest } = parsed.data;
     await prisma.employee.create({
       data: {
-        ...parsed.data,
+        ...rest,
+        nip,
         phone: parsed.data.phone || null,
       },
     });
@@ -98,11 +104,13 @@ export async function updateEmployee(
   }
 
   try {
+    const { nip, ...rest } = parsed.data;
     await prisma.employee.update({
       where: { id: idParsed.data },
       data: {
-        ...parsed.data,
-        phone: parsed.data.phone || null,
+        ...rest,
+        nip,
+        phone: rest.phone || null,
       },
     });
   } catch (error) {

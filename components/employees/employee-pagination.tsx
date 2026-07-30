@@ -1,24 +1,26 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-type EmployeePaginationProps = {
+type PaginationProps = {
   page: number;
   totalPages: number;
   total: number;
   pageSize: number;
   searchParams: Record<string, string | undefined>;
+  basePath?: string;
 };
 
 function buildHref(
   page: number,
   searchParams: Record<string, string | undefined>,
+  basePath: string,
 ) {
   const params = new URLSearchParams();
   Object.entries(searchParams).forEach(([key, value]) => {
     if (value) params.set(key, value);
   });
   params.set("page", String(page));
-  return `/employees?${params.toString()}`;
+  return `${basePath}?${params.toString()}`;
 }
 
 export function EmployeePagination({
@@ -27,7 +29,8 @@ export function EmployeePagination({
   total,
   pageSize,
   searchParams,
-}: EmployeePaginationProps) {
+  basePath = "/employees",
+}: PaginationProps) {
   if (total === 0) return null;
 
   const from = (page - 1) * pageSize + 1;
@@ -46,7 +49,7 @@ export function EmployeePagination({
           disabled={page <= 1}
           className={page <= 1 ? "pointer-events-none opacity-50" : undefined}
         >
-          <Link href={buildHref(Math.max(1, page - 1), searchParams)}>
+          <Link href={buildHref(Math.max(1, page - 1), searchParams, basePath)}>
             Sebelumnya
           </Link>
         </Button>
@@ -62,7 +65,9 @@ export function EmployeePagination({
             page >= totalPages ? "pointer-events-none opacity-50" : undefined
           }
         >
-          <Link href={buildHref(Math.min(totalPages, page + 1), searchParams)}>
+          <Link
+            href={buildHref(Math.min(totalPages, page + 1), searchParams, basePath)}
+          >
             Berikutnya
           </Link>
         </Button>

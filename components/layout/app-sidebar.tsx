@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
   {
@@ -50,6 +51,9 @@ export function AppSidebar() {
           );
         })}
       </nav>
+      <div className="border-t p-4">
+        <ThemeToggle />
+      </div>
     </aside>
   );
 }

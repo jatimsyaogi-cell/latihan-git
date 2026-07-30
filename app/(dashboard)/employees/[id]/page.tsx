@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
 import { DeleteEmployeeDialog } from "@/components/employees/delete-employee-dialog";
+import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 
 export const metadata = {
   title: "Detail Karyawan",
@@ -68,7 +69,19 @@ export default async function EmployeeDetailPage({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Informasi Karyawan</CardTitle>
+          <div className="flex items-center gap-4">
+            <EmployeeAvatar
+              name={employee.name}
+              src={employee.avatarUrl}
+              size={72}
+            />
+            <div>
+              <CardTitle className="text-xl">{employee.name}</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {employee.position} · {employee.department}
+              </p>
+            </div>
+          </div>
           <EmployeeStatusBadge status={employee.status} />
         </CardHeader>
         <CardContent>

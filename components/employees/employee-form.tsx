@@ -13,6 +13,7 @@ import {
 import { DEPARTMENTS, STATUS_LABELS } from "@/lib/constants";
 import { toDateInputValue } from "@/lib/utils";
 import { createEmployee, updateEmployee } from "@/lib/employees/actions";
+import { AvatarUploader } from "@/components/employees/avatar-uploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +53,7 @@ export function EmployeeForm({ mode, employee }: EmployeeFormProps) {
       joinedAt: employee?.joinedAt
         ? new Date(employee.joinedAt)
         : new Date(),
+      avatarUrl: employee?.avatarUrl ?? "",
     },
   });
 
@@ -115,10 +117,26 @@ export function EmployeeForm({ mode, employee }: EmployeeFormProps) {
         </CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="space-y-6">
+          <AvatarUploader
+            name={watch("name") || ""}
+            value={watch("avatarUrl") ?? ""}
+            onChange={(url) => setValue("avatarUrl", url)}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="nip">NIP</Label>
-            <Input id="nip" placeholder="EMP013" {...register("nip")} />
+            <Input
+              id="nip"
+              placeholder={mode === "create" ? "Kosongkan untuk otomatis" : "EMP013"}
+              {...register("nip")}
+            />
+            {mode === "create" ? (
+              <p className="text-xs text-muted-foreground">
+                Kosongkan agar dibuat otomatis berurutan (mis. EMP013).
+              </p>
+            ) : null}
             {errors.nip ? (
               <p className="text-sm text-destructive">{errors.nip.message}</p>
             ) : null}
@@ -243,6 +261,7 @@ export function EmployeeForm({ mode, employee }: EmployeeFormProps) {
                 {errors.joinedAt.message}
               </p>
             ) : null}
+          </div>
           </div>
         </CardContent>
 

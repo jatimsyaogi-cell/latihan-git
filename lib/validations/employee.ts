@@ -20,9 +20,24 @@ export const employeeFormSchema = z.object({
   joinedAt: z.coerce.date({
     errorMap: () => ({ message: "Tanggal masuk tidak valid" }),
   }),
+  avatarUrl: z.string().trim().url("URL avatar tidak valid").optional().or(z.literal("")),
 });
 
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
+
+/**
+ * Saat create, NIP boleh dikosongkan — server akan generate berurutan.
+ * Saat diisi, nilai tersebut dipakai (harus unik).
+ */
+export const employeeCreateSchema = employeeFormSchema.extend({
+  nip: z
+    .string()
+    .trim()
+    .min(3, "NIP minimal 3 karakter")
+    .max(30, "NIP maksimal 30 karakter")
+    .optional()
+    .or(z.literal("")),
+});
 
 export const employeeIdSchema = z.string().min(1);
 
@@ -34,8 +49,8 @@ export const employeeListQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(5).max(50).default(10),
   sort: z
     .enum(["name", "nip", "department", "joinedAt", "createdAt"])
-    .default("createdAt"),
-  order: z.enum(["asc", "desc"]).default("desc"),
+    .default("nip"),
+  order: z.enum(["asc", "desc"]).default("asc"),
 });
 
 export type EmployeeListQuery = z.infer<typeof employeeListQuerySchema>;
