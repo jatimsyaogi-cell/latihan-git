@@ -54,10 +54,11 @@ export async function setupAdmin(raw: unknown): Promise<AuthResult> {
       name: parsed.data.name,
       email: parsed.data.email.toLowerCase().trim(),
       password: hash,
+      role: "SUPER_ADMIN",
     },
   });
 
-  await createSession(user.id, user.email);
+  await createSession(user.id, user.email, user.role);
   return { success: true };
 }
 
@@ -83,7 +84,7 @@ export async function login(raw: unknown): Promise<AuthResult> {
     return { success: false, error: "Email atau password salah" };
   }
 
-  await createSession(user.id, user.email);
+  await createSession(user.id, user.email, user.role);
   return { success: true };
 }
 

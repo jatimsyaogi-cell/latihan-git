@@ -10,7 +10,7 @@ import {
   employeeIdSchema,
 } from "@/lib/validations/employee";
 import { generateNextNip } from "@/lib/employees/queries";
-import { requireSession } from "@/lib/auth/session";
+import { requireSession, requireWriteSession } from "@/lib/auth/session";
 
 export type ActionResult<T = void> =
   | { success: true; data?: T }
@@ -58,7 +58,11 @@ function mapPrismaError(error: unknown): ActionResult {
 }
 
 export async function createEmployee(raw: unknown): Promise<ActionResult> {
-  await requireSession();
+  try {
+    await requireWriteSession();
+  } catch {
+    return { success: false, error: "Tidak punya akses untuk menambah data" };
+  }
   const parsed = employeeCreateSchema.safeParse(raw);
   if (!parsed.success) {
     return {
@@ -71,12 +75,13 @@ export async function createEmployee(raw: unknown): Promise<ActionResult> {
   try {
     const providedNip = parsed.data.nip?.trim();
     const nip = providedNip ? providedNip : await generateNextNip();
-    const { nip: _nip, ...rest } = parsed.data;
+    const { nip: _nip, avatarUrl, ...rest } = parsed.data;
     await prisma.employee.create({
       data: {
         ...rest,
         nip,
         phone: parsed.data.phone || null,
+        avatarUrl: avatarUrl || null,
       },
     });
   } catch (error) {
@@ -91,7 +96,11 @@ export async function updateEmployee(
   id: string,
   raw: unknown,
 ): Promise<ActionResult> {
-  await requireSession();
+  try {
+    await requireWriteSession();
+  } catch {
+    return { success: false, error: "Tidak punya akses untuk mengubah data" };
+  }
   const idParsed = employeeIdSchema.safeParse(id);
   if (!idParsed.success) {
     return { success: false, error: "ID tidak valid" };
@@ -107,13 +116,14 @@ export async function updateEmployee(
   }
 
   try {
-    const { nip, ...rest } = parsed.data;
+    const { nip, avatarUrl, ...rest } = parsed.data;
     await prisma.employee.update({
       where: { id: idParsed.data },
       data: {
         ...rest,
         nip,
         phone: rest.phone || null,
+        avatarUrl: avatarUrl || null,
       },
     });
   } catch (error) {
@@ -126,7 +136,11 @@ export async function updateEmployee(
 }
 
 export async function deleteEmployee(id: string): Promise<ActionResult> {
-  await requireSession();
+  try {
+    await requireWriteSession();
+  } catch {
+    return { success: false, error: "Tidak punya akses untuk menghapus data" };
+  }
   const idParsed = employeeIdSchema.safeParse(id);
   if (!idParsed.success) {
     return { success: false, error: "ID tidak valid" };

@@ -4,9 +4,14 @@ import { cookies } from "next/headers";
 export const SESSION_COOKIE = "admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
 
+import type { UserRole } from "@prisma/client";
+
+export type { UserRole };
+
 type SessionPayload = {
   userId: string;
   email: string;
+  role: UserRole;
 };
 
 function getSecret(): Uint8Array {
@@ -20,9 +25,10 @@ function getSecret(): Uint8Array {
 export async function createSession(
   userId: string,
   email: string,
+  role: UserRole,
 ): Promise<void> {
   const cookieStore = await cookies();
-  const token = await new SignJWT({ userId, email } satisfies SessionPayload)
+  const token = await new SignJWT({ userId, email, role } satisfies SessionPayload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_MAX_AGE}s`)
@@ -49,8 +55,18 @@ export async function getSession(): Promise<SessionPayload | null> {
 
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (typeof payload.userId === "string" && typeof payload.email === "string") {
-      return { userId: payload.userId, email: payload.email };
+    if (
+      typeof payload.userId === "string" &&
+      typeof payload.email === "string" &&
+      (payload.role === "SUPER_ADMIN" ||
+        payload.role === "ADMIN" ||
+        payload.role === "VIEWER")
+    ) {
+      return {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role as UserRole,
+      };
     }
     return null;
   } catch {
@@ -65,7 +81,24 @@ export async function requireSession(): Promise<SessionPayload> {
     redirect("/login");
   }
 
-  return session as SessionPayload;
+  return session;
+}
+
+/** Tolak VIEWER — hanya ADMIN & SUPER_ADMIN yang boleh mutasi. */
+export async function requireWriteSession(): Promise<SessionPayload> {
+  const session = await requireSession();
+  if (session.role === "VIEWER") {
+    throw new Error("FORBIDDEN");
+  }
+  return session;
+}
+
+export function canWrite(role: UserRole | undefined): boolean {
+  return role === "SUPER_ADMIN" || role === "ADMIN";
+}
+
+export function canManageUsers(role: UserRole | undefined): boolean {
+  return role === "SUPER_ADMIN";
 }
 
 /** Dipakai di middleware (edge context). */
@@ -75,8 +108,18 @@ export async function getSessionFromToken(
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (typeof payload.userId === "string" && typeof payload.email === "string") {
-      return { userId: payload.userId, email: payload.email };
+    if (
+      typeof payload.userId === "string" &&
+      typeof payload.email === "string" &&
+      (payload.role === "SUPER_ADMIN" ||
+        payload.role === "ADMIN" ||
+        payload.role === "VIEWER")
+    ) {
+      return {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role as UserRole,
+      };
     }
     return null;
   } catch {

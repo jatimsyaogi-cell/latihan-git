@@ -112,12 +112,18 @@ export default function LoginPage() {
                   {errors.password.message}
                 </p>
               ) : null}
-              <div className="flex justify-end">
+              <div className="flex justify-between">
                 <Link
                   href="/forgot-password"
                   className="text-xs font-medium text-primary hover:underline"
                 >
                   Lupa password?
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Belum punya akun? Buat akun
                 </Link>
               </div>
             </div>

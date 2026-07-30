@@ -10,27 +10,21 @@ function firstValue(value: string | string[] | undefined) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  const normalized = {
+  const parsed = employeeListQuerySchema.safeParse({
     q: firstValue(searchParams.get("q") ?? undefined),
     department: firstValue(searchParams.get("department") ?? undefined),
     status: firstValue(searchParams.get("status") ?? undefined),
-  };
-
-  const parsed = employeeListQuerySchema.safeParse({
-    q: normalized.q,
-    department: normalized.department,
-    status: normalized.status,
   });
 
   const filters = parsed.success
-    ? parsed.data
+    ? {
+        q: parsed.data.q || undefined,
+        department: parsed.data.department,
+        status: parsed.data.status,
+      }
     : { q: undefined, department: undefined, status: undefined };
-  const employees = await getEmployeesForExport({
-    q: filters.q,
-    department: filters.department,
-    status: filters.status,
-  });
 
+  const employees = await getEmployeesForExport(filters);
   const csv = employeesToCsv(employees);
   const stamp = new Date().toISOString().slice(0, 10);
 

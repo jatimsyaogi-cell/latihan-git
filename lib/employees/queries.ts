@@ -138,3 +138,18 @@ export async function generateNextNip(): Promise<string> {
   const next = max + 1;
   return `EMP${String(next).padStart(3, "0")}`;
 }
+
+export async function getUsers() {
+  return prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+}
+
+export type UserData = Awaited<ReturnType<typeof getUsers>>[number];

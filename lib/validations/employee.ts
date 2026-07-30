@@ -7,8 +7,9 @@ export const employeeFormSchema = z.object({
   nip: z
     .string()
     .trim()
-    .min(3, "NIP minimal 3 karakter")
-    .max(30, "NIP maksimal 30 karakter"),
+    .max(30, "NIP maksimal 30 karakter")
+    .optional()
+    .or(z.literal("")),
   name: z.string().trim().min(2, "Nama minimal 2 karakter").max(100),
   email: z.string().trim().email("Email tidak valid"),
   phone: z.string().trim().max(20).optional().or(z.literal("")),
@@ -20,6 +21,7 @@ export const employeeFormSchema = z.object({
   joinedAt: z.coerce.date({
     errorMap: () => ({ message: "Tanggal masuk tidak valid" }),
   }),
+  avatarUrl: z.string().trim().optional().or(z.literal("")),
 });
 
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;

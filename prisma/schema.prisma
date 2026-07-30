@@ -12,11 +12,18 @@ enum EmployeeStatus {
   INACTIVE
 }
 
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
+  role      UserRole @default(ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -31,6 +38,7 @@ model Employee {
   position   String
   status     EmployeeStatus @default(ACTIVE)
   joinedAt   DateTime
+  avatarUrl  String?
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 }
