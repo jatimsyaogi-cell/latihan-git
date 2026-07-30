@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Users } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppHeader() {
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Pendataan Karyawan";
@@ -10,6 +11,7 @@ export function AppHeader() {
         <Users className="h-4 w-4" />
         {appName}
       </Link>
+      <ThemeToggle />
     </header>
   );
 }
