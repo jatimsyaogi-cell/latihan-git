@@ -48,9 +48,13 @@ export function DepartmentStats({ stats }: DepartmentStatsProps) {
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{row.department}</span>
                 <span className="tabular-nums text-muted-foreground">
-                  <span className="text-emerald-600">{row.active} aktif</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    {row.active} aktif
+                  </span>
                   {" · "}
-                  <span className="text-slate-500">{row.inactive} nonaktif</span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    {row.inactive} nonaktif
+                  </span>
                   {" · "}
                   <span className="font-medium text-foreground">
                     {row.total} total

@@ -13,6 +13,7 @@ import {
 import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
 import { DeleteEmployeeDialog } from "@/components/employees/delete-employee-dialog";
+import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 
 export const metadata = {
   title: "Detail Karyawan",
