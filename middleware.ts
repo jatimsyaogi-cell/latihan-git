@@ -9,9 +9,11 @@ function isPublic(pathname: string): boolean {
 }
 
 function getSecret(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET;
   if (!secret) {
-    throw new Error("AUTH_SECRET belum diset di environment");
+    throw new Error(
+      "AUTH_SECRET (atau BETTER_AUTH_SECRET) belum diset di environment",
+    );
   }
   return new TextEncoder().encode(secret);
 }
