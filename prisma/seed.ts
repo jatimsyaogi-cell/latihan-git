@@ -1,4 +1,5 @@
 import { PrismaClient, EmployeeStatus } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -126,9 +127,22 @@ const employees = [
 ];
 
 async function main() {
+  const hash = await bcrypt.hash("jati123", 10);
+
   await prisma.employee.deleteMany();
+  await prisma.user.deleteMany();
+
+  await prisma.user.create({
+    data: {
+      name: "Super Admin",
+      email: "admin@example.com",
+      password: hash,
+      role: "SUPER_ADMIN",
+    },
+  });
+
   await prisma.employee.createMany({ data: employees });
-  console.log(`Seeded ${employees.length} employees`);
+  console.log(`Seeded 1 admin user & ${employees.length} employees`);
 }
 
 main()

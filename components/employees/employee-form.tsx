@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import type { Employee } from "@prisma/client";
 import {
+  employeeCreateSchema,
   employeeFormSchema,
   type EmployeeFormValues,
 } from "@/lib/validations/employee";

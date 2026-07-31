@@ -2,21 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users } from "lucide-react";
+import { Users, ShieldCheck, UserCheck, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/layout/logout-button";
+import { useEffect, useState } from "react";
 
-const navItems = [
-  {
-    href: "/employees",
-    label: "Karyawan",
-    icon: Users,
-  },
-];
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+};
 
 export function AppSidebar() {
   const pathname = usePathname();
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Pendataan Karyawan";
+  const [role, setRole] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    void fetch("/api/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.role) setRole(data.role);
+      })
+      .catch(() => null);
+  }, []);
+
+  const navItems: NavItem[] = [
+    { href: "/employees", label: "Karyawan", icon: Users },
+    { href: "/activities", label: "Riwayat Aktivitas", icon: History, exact: true },
+    { href: "/registered-accounts", label: "Daftar Akun", icon: UserCheck, exact: true },
+    ...(mounted && role === "SUPER_ADMIN"
+      ? [{ href: "/users", label: "Akun Pengguna", icon: ShieldCheck, exact: true } as NavItem]
+      : []),
+  ];
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-card md:flex md:flex-col">
@@ -30,10 +52,10 @@ export function AppSidebar() {
       </div>
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = item.exact
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
-
           return (
             <Link
               key={item.href}
@@ -51,8 +73,9 @@ export function AppSidebar() {
           );
         })}
       </nav>
-      <div className="border-t p-4">
+      <div className="border-t p-4 space-y-3">
         <ThemeToggle />
+        <LogoutButton />
       </div>
     </aside>
   );

@@ -1,28 +1,55 @@
-generator client {
-  provider = "prisma-client-js"
-}
+  generator client {
+    provider = "prisma-client-js"
+  }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-enum EmployeeStatus {
-  ACTIVE
-  INACTIVE
-}
+  model User {
+    id        String   @id @default(cuid())
+    name      String
+    email     String   @unique
+    password  String
+    role      UserRole @default(ADMIN)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
 
-model Employee {
-  id         String         @id @default(cuid())
-  nip        String         @unique
-  name       String
-  email      String         @unique
-  phone      String?
-  department String
-  position   String
-  status     EmployeeStatus @default(ACTIVE)
-  joinedAt   DateTime
-  avatarUrl  String?
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-}
+  model Employee {
+    id         String         @id @default(cuid())
+    nip        String         @unique
+    name       String
+    email      String         @unique
+    phone      String?
+    department String
+    position   String
+    status     EmployeeStatus @default(ACTIVE)
+    joinedAt   DateTime
+    avatarUrl  String?
+    createdAt  DateTime       @default(now())
+    updatedAt  DateTime       @updatedAt
+  }
+
+  model ActivityLog {
+    id        String   @id @default(cuid())
+    userId    String?
+    email     String?
+    action    String
+    detail    String?
+    createdAt DateTime @default(now())
+
+    @@index([createdAt])
+  }
+
+  enum EmployeeStatus {
+    ACTIVE
+    INACTIVE
+  }
+
+  enum UserRole {
+    SUPER_ADMIN
+    ADMIN
+    VIEWER
+  }

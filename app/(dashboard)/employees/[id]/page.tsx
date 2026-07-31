@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmployeeAvatar } from "@/components/employees/employee-avatar";
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
 import { DeleteEmployeeDialog } from "@/components/employees/delete-employee-dialog";
 import { EmployeeAvatar } from "@/components/employees/employee-avatar";
