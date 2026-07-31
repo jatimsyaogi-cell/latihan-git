@@ -32,6 +32,17 @@
     updatedAt  DateTime       @updatedAt
   }
 
+  model ActivityLog {
+    id        String   @id @default(cuid())
+    userId    String?
+    email     String?
+    action    String
+    detail    String?
+    createdAt DateTime @default(now())
+
+    @@index([createdAt])
+  }
+
   enum EmployeeStatus {
     ACTIVE
     INACTIVE

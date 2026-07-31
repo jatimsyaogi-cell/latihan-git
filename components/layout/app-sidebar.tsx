@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, ShieldCheck, UserCheck } from "lucide-react";
+import { Users, ShieldCheck, UserCheck, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/components/layout/logout-button";
@@ -33,6 +33,7 @@ export function AppSidebar() {
 
   const navItems: NavItem[] = [
     { href: "/employees", label: "Karyawan", icon: Users },
+    { href: "/activities", label: "Riwayat Aktivitas", icon: History, exact: true },
     { href: "/registered-accounts", label: "Daftar Akun", icon: UserCheck, exact: true },
     ...(mounted && role === "SUPER_ADMIN"
       ? [{ href: "/users", label: "Akun Pengguna", icon: ShieldCheck, exact: true } as NavItem]
